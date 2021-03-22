@@ -31,14 +31,14 @@
                     "apiVersion": "2020-08-01-preview",
                     "name": "default/input-csv",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName')"
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
                     ],
                     "properties": {
                         "defaultEncryptionScope": "$account-encryption-key",
                         "denyEncryptionScopeOverride": false,
                         "publicAccess": "None"
                     }
-                },
+                }
             ]
         },
         {
@@ -46,28 +46,40 @@
             "apiVersion": "2020-10-01",
             "name": "injectInputData",
             "location": "[resourceGroup().location]",
-            "kind": "AzurePowerShell",
-            "environmentVariables": [
-                {
-                    "name": "StorageName",
-                    "value": "[variables('storageName')]"
-                },
-                {
-                    "name": "StorageKey",
-                    "value": "[[listKeys(resourceId('Microsoft.Storage/storageAccounts',variables('storageName')) ,'2019-06-01').key1]]"
-                },
-            ],
+            "kind": "AzureCLI",
             "properties": {
-                "forceUpdateTag": "[parameters('utcValue')]",
-                "azPowerShellVersion": "5.0",
-                "scriptContent": "
-                    AzCopy --source 'https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/data/input.csv' `
-                           --destination 'https://{0}.blob.core.windows.net/input-csv/' -f ${Env:StorageName}
-                           --dest-key ${Env:StorageKey}
-        ",
+                "forceUpdateTag": "1",
+                "azCliVersion": "2.9.0",
+                "environmentVariables": [
+                    {
+                        "name": "INPUT_URI",
+                        "value": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/data/input.csv"
+                    },
+                    {
+                        "name": "CONTAINER_NAME",
+                        "value": "input-csv"
+                    },
+                    {
+                        "name": "BLOB_NAME",
+                        "value": "input.csv"
+                    },
+                    {
+                        "name": "STORAGE_ACCOUNT",
+                        "value": "[variables('storageName')]"
+                    },
+                    {
+                        "name": "STORAGE_KEY",
+                        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts',variables('storageName')) ,'2019-06-01').keys[0].value]"
+                    }
+                ],
+                "primaryScriptUri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/uploadInputCsv.sh",
                 "timeout": "PT1H",
-                "retentionInterval": "P1D"
-            }
+                "retentionInterval": "P1D",
+                "cleanupPreferences": "OnSuccess"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', variables('storageName'), 'default', 'input-csv')]"
+            ]
         }
     ],
     "outputs": {}
