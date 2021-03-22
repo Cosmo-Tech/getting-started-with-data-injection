@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "location for resource created."
+            }
+        }
+    },
+    "variables": {
+        "storageName": "[concat('input', take(uniqueString(resourceGroup().id),8))]"
+    },
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "resources": [
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2020-08-01-preview",
+                    "name": "default/input-csv",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName')"
+                    ],
+                    "properties": {
+                        "defaultEncryptionScope": "$account-encryption-key",
+                        "denyEncryptionScopeOverride": false,
+                        "publicAccess": "None"
+                    }
+                },
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2020-10-01",
+            "name": "injectInputData",
+            "location": "[resourceGroup().location]",
+            "kind": "AzurePowerShell",
+            "environmentVariables": [
+                {
+                    "name": "StorageName",
+                    "value": "[variables('storageName')]"
+                },
+                {
+                    "name": "StorageKey",
+                    "value": "[[listKeys(resourceId('Microsoft.Storage/storageAccounts',variables('storageName')) ,'2019-06-01').key1]]"
+                },
+            ],
+            "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azPowerShellVersion": "5.0",
+                "scriptContent": "
+                    AzCopy --source 'https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/data/input.csv' `
+                           --destination 'https://{0}.blob.core.windows.net/input-csv/' -f ${Env:StorageName}
+                           --dest-key ${Env:StorageKey}
+        ",
+                "timeout": "PT1H",
+                "retentionInterval": "P1D"
+            }
+        }
+    ],
+    "outputs": {}
+}

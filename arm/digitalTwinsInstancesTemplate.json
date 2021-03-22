@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "location for resource created."
+            }
+        },
+        "digitalTwinName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the new Digital Twins Instances. Leave empty for default name."
+            }
+        }
+    },
+    "variables": {
+        "dtName": "[if(empty(parameters('digitalTwinName')),concat('digitaltwin', take(uniqueString(resourceGroup().id),8)),parameters('digitalTwinName'))]",
+    },
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.DigitalTwins/digitalTwinsInstances",
+            "apiVersion": "2020-12-01",
+            "name": "[variables('dtName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicNetworkAccess": "Enabled"
+            }
+        }
+    ],
+    "outputs": {}
+}

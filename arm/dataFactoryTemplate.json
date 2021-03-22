@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "location for resource created."
+            }
+        },
+        "dataFactoryName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the new Data Factory. Leave empty for default name."
+            }
+        }
+    },
+    "variables": {
+        "dfName": "[if(empty(parameters('dataFactoryName')),concat('datafactory', take(uniqueString(resourceGroup().id),8)),parameters('dataFactoryName'))]",
+    },
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.DataFactory/factories",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('dfName')]",
+            "location": "[parameters('location')]"
+        }
+    ],
+    "outputs": {}
+}
+
