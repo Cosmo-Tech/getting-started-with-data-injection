@@ -1,0 +1,44 @@
+[
+    {
+        "displayName": {
+            "en": "Warehouse"
+        },
+        "description": {},
+        "id": "dtmi:mysupplychain:warehouse;1",
+        "uploadTime": "2021-02-01T12:39:41.527Z",
+        "decommissioned": false,
+        "model": {
+            "@id": "dtmi:mysupplychain:warehouse;1",
+            "@type": "Interface",
+            "displayName": "Warehouse",
+            "@context": [
+                "dtmi:dtdl:context;2"
+            ],
+            "contents": [
+                {
+                    "@type": "Property",
+                    "name": "Latitude",
+                    "schema": "double"
+                },
+                {
+                    "@type": "Property",
+                    "name": "Longitude",
+                    "schema": "double"
+                },
+                {
+                    "@type": "Relationship",
+                    "name": "SendsTo",
+                    "displayName": "SendsTo",
+                    "target": "dtmi:mysupplychain:warehouse;1",
+                    "properties": [
+                        {
+                            "name": "distance",
+                            "@type": "Property",
+                            "schema": "double"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]
