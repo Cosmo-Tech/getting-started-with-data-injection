@@ -19,6 +19,8 @@
     },
     "variables": {
         "dtName": "[if(empty(parameters('digitalTwinName')),concat('digitaltwin', take(uniqueString(resourceGroup().id),8)),parameters('digitalTwinName'))]",
+        "idName": "[concat(variables('dtName'),'ServicePrincipal')]",
+        "raName": "[guid(uniqueString(variables('idName'), 'Azure Digital Twins Data Owner', variables('dtName')))]"
     },
     "functions": [],
     "resources": [
@@ -32,11 +34,39 @@
             }
         },
         {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "name": "[variables('idName')]",
+            "apiVersion": "2018-11-30",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-04-01-preview",
+            "name": "[variables('raName')]",
+            "dependsOn": [
+                "[variables('idName')]",
+                "[variables('dtName')]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'bcd981a7-7f74-457b-83e1-cceb9e632ffe')]",
+                "principalId": "[reference(variables('idName')).principalId]",
+                "scope": "[resourceGroup().id]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
             "type": "Microsoft.Resources/deploymentScripts",
             "apiVersion": "2020-10-01",
             "name": "injectModels",
             "location": "[resourceGroup().location]",
             "kind": "AzureCLI",
+            "identity": {
+                "type": "userAssigned",
+                "userAssignedIdentities": {
+                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('idName'))]": { 
+                    }
+                }
+            },
             "properties": {
                 "forceUpdateTag": "1",
                 "azCliVersion": "2.9.0",
@@ -50,8 +80,12 @@
                         "value": "models.json"
                     },
                     {
-                        "name": "MODEL_INSTANCES_NAME",
-                        "value": "[variables('dtName')]"
+                        "name": "MODEL_INSTANCES_HOSTNAME",
+                        "value": "[reference(variables('dtName'), '2020-12-01', 'Full').properties.hostname]"
+                    },
+                    {
+                        "name": "RESOURCE_GROUP",
+                        "value": "[resourceGroup().name]"
                     }
                 ],
                 "primaryScriptUri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/uploadTwinModels.sh",
@@ -60,7 +94,9 @@
                 "cleanupPreferences": "OnSuccess"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.DigitalTwins/digitalTwinsInstances', variables('dtName'))]"
+                "[variables('dtName')]",
+                "[variables('idName')]",
+                "[variables('raName')]"
             ]
         }
     ],
