@@ -25,7 +25,7 @@
             "properties": {
                 "type": "AzureBlobStorage",
                 "typeProperties": {
-                    "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', listKeys('Microsoft.Storage/storageAccounts', parameters('storageName'), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                    "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
                 }
             }
         }
