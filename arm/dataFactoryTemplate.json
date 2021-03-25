@@ -13,12 +13,12 @@
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description": "Name of the new Data Factory. Leave empty for default name."
+                "description": "Name of the new Data Factory."
             }
         }
     },
     "variables": {
-        "dfName": "[if(empty(parameters('dataFactoryName')),concat('datafactory', take(uniqueString(resourceGroup().id),8)),parameters('dataFactoryName'))]",
+        "dfName": "[parameters('dataFactoryName')]",
     },
     "functions": [],
     "resources": [
