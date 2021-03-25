@@ -21,8 +21,10 @@
             "members": {
                 "storageKey": {
                     "parameters": [
-                        "name": "storageName",
-                        "type": "string"
+                        {
+                            "name": "storageName",
+                            "type": "string"
+                        }
                     ],
                     "output": {
                         "type": "string",
