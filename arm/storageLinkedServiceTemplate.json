@@ -4,11 +4,11 @@
     "parameters": {
         "factoryName": {
             "type": "string",
-            "metadata": "Data Factory name",
+            "metadata": "Data Factory name"
         },
         "storageName": {
             "type": "string",
-            "metadata": "Storage Account name",
+            "metadata": "Storage Account name"
         },
         "linkedServiceName": {
             "type": "string",
