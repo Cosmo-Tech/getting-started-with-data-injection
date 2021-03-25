@@ -15,9 +15,25 @@
             "metadata": "Linked Service Name"
         }
     },
+    "functions": [
+        {
+            "namespace": "csm",
+            "members": {
+                "storageKey": {
+                    "parameters": [
+                        "name": "storageName",
+                        "type": "string"
+                    ],
+                    "output": {
+                        "type": "string",
+                        "value": "[listKeys('Microsoft.Storage/storageAccounts', parameters('storageName'), '2019-04-01').keys[0].value]"
+                    }
+                }
+            }
+        }
+    ],
     "variables": {
-        "storageKey": "[listKeys('Microsoft.Storage/storageAccounts', parameters('storageName'), '2019-04-01').keys[0].value]", 
-        "storageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', variables('storageKey'),';EndpointSuffix=core.windows.net')]"
+        "storageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', storageKey(parameters('storageName')),';EndpointSuffix=core.windows.net')]"
     },
     "resources": [
         {
