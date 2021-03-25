@@ -9,7 +9,7 @@
         "storageName": {
             "type": "string",
             "metadata": "Storage Account name",
-        }
+        },
         "linkedServiceName": {
             "type": "string",
             "metadata": "Linked Service Name"
