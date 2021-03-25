@@ -1,0 +1,37 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+        },
+        "storageName": {
+            "type": "string",
+            "metadata": "Storage Account name",
+        }
+        "linkedServiceName": {
+            "type": "string",
+            "metadata": "Linked Service Name"
+        }
+    },
+    "variables": {
+        "storageKey": "[listKeys('Microsoft.Storage/storageAccounts', parameters('storageName')), '2019-04-01').keys[0].value)]", 
+        "storageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', variables('storageKey'),';EndpointSuffix=core.windows.net')]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/', parameters('linkedServiceName'))]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobStorage",
+                "typeProperties": {
+                    "connectionString": "[variables('storageConnectionString')]"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}
