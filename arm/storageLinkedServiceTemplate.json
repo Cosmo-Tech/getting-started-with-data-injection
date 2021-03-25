@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "factoryName": {
@@ -15,41 +15,19 @@
             "metadata": "Linked Service Name"
         }
     },
-    "functions": [
-        {
-            "namespace": "csm",
-            "members": {
-                "storageKey": {
-                    "parameters": [
-                        {
-                            "name": "storageName",
-                            "type": "string"
-                        }
-                    ],
-                    "output": {
-                        "type": "string",
-                        "value": "[listKeys('Microsoft.Storage/storageAccounts', parameters('storageName'), '2019-04-01').keys[0].value]"
-                    }
-                }
-            }
-        }
-    ],
-    "variables": {
-        "storageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', storageKey(parameters('storageName')),';EndpointSuffix=core.windows.net')]"
-    },
+    "functions": [],
+    "variables": {},
     "resources": [
         {
             "name": "[concat(parameters('factoryName'), '/', parameters('linkedServiceName'))]",
             "type": "Microsoft.DataFactory/factories/linkedServices",
             "apiVersion": "2018-06-01",
             "properties": {
-                "annotations": [],
                 "type": "AzureBlobStorage",
                 "typeProperties": {
-                    "connectionString": "[variables('storageConnectionString')]"
+                    "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageName'), ';AccountKey=', listKeys('Microsoft.Storage/storageAccounts', parameters('storageName'), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
                 }
-            },
-            "dependsOn": []
+            }
         }
     ]
 }
