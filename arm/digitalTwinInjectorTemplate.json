@@ -9,17 +9,11 @@
                 "description": "location for resource created."
             }
         },
-        "dataFactoryName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Name of an existing Data Factory in the resource group. Leave empty for creating one."}
-        },
         "digitalTwinName": {
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description": "Name of an existing Digital Twins Instances in the resource group. Leave empty for creating one."
+                "description": "Name of an existing Digital Twins Instances in the resource group."
             }
         },
         "functionAppName": {
@@ -31,38 +25,11 @@
         }
     },
     "variables": {
-        "dtName": "[if(empty(parameters('digitalTwinName')),concat('digitaltwin', take(uniqueString(resourceGroup().id),8)),parameters('digitalTwinName'))]",
-        "dfName": "[if(empty(parameters('dataFactoryName')),concat('datafactory', take(uniqueString(resourceGroup().id),8)),parameters('dataFactoryName'))]",
+        "dtName": "[parameters('digitalTwinName')]",
         "faName": "[if(empty(parameters('functionAppName')),concat('functionapp', take(uniqueString(resourceGroup().id),8)),parameters('functionAppName'))]"
     },
     "functions": [],
     "resources": [
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
-            "name": "[concat('input', take(uniqueString(resourceGroup().id),8))]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "StorageV2"
-        },
-        {
-            "type": "Microsoft.DigitalTwins/digitalTwinsInstances",
-            "apiVersion": "2020-12-01",
-            "name": "[variables('dtName')]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "publicNetworkAccess": "Enabled"
-            }
-        },
-        {
-            "type": "Microsoft.DataFactory/factories",
-            "apiVersion": "2018-06-01",
-            "name": "[variables('dfName')]",
-            "location": "[parameters('location')]"
-        },
         {
             "type": "Microsoft.Resources/deployments",
             "name": "injector-deployment",
@@ -79,18 +46,12 @@
                     "digitalTwinsInstancesName": {
                         "value": "[variables('dtName')]"
                     },
-                    "dataFactoryName": {
-                        "value": "[variables('dfName')]"
-                    },
                     "functionAppName": {
                         "value": "[variables('faName')]"
                     }
                 }
             },
-            "dependsOn": [
-                "[resourceId('Microsoft.DataFactory/factories', variables('dfName'))]",
-                "[resourceId('Microsoft.DigitalTwins/digitalTwinsInstances', variables('dtName'))]"
-            ]
+            "dependsOn": []
         }
     ],
     "outputs": {}

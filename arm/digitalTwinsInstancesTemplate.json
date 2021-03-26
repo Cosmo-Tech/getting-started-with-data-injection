@@ -73,7 +73,7 @@
                 "environmentVariables": [
                     {
                         "name": "MODEL_URI",
-                        "value": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/data/models.json"
+                        "value": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/assets/models.json"
                     },
                     {
                         "name": "MODEL_FILE",

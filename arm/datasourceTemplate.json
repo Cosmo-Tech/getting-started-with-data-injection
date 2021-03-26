@@ -1,0 +1,577 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dataFactoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+        },
+        "blobStorageService_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'blobStorageService'"
+        },
+        "AzureFunction1_functionKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'functionKey' of 'AzureFunction1'"
+        },
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/Trips')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "blobStorageService",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobStorageLocation",
+                        "container": "adt-csv"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/blobStorageService')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/Routes')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "blobStorageService",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobStorageLocation",
+                        "container": "adt-csv"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/blobStorageService')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/CustomerData')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "blobStorageService",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Excel",
+                "typeProperties": {
+                    "sheetName": "Distancier",
+                    "location": {
+                        "type": "AzureBlobStorageLocation",
+                        "fileName": "20200513 IMO Distances Xcargo - modifié.xlsx",
+                        "container": "customer-data"
+                    },
+                    "firstRowAsHeader": true
+                },
+                "schema": [
+                    {
+                        "name": "Source ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Destination ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Source_LAT",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Source_LONG",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Destination_LAT",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Destination_LONG",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Distance",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/blobStorageService')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/InputCSV')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "blobStorageService",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobStorageLocation",
+                        "container": "input-csv"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "Source ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Destination ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Source_LAT",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Source_LONG",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Destination_LAT",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Destination_LONG",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Distance",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/blobStorageService')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/blobTrigger')]",
+            "type": "Microsoft.DataFactory/factories/triggers",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "runtimeState": "Stopped",
+                "pipelines": [
+                    {
+                        "pipelineReference": {
+                            "referenceName": "FullPipeline",
+                            "type": "PipelineReference"
+                        },
+                        "parameters": {}
+                    }
+                ],
+                "type": "BlobEventsTrigger",
+                "typeProperties": {
+                    "blobPathBeginsWith": "/input-excel/blobs/",
+                    "blobPathEndsWith": ".xlsx",
+                    "ignoreEmptyBlobs": true,
+                    "scope": "[parameters('blobTrigger_properties_typeProperties_scope')]",
+                    "events": [
+                        "Microsoft.Storage.BlobCreated"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/FullPipeline')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/FullPipeline')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "ImportCustomerData",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "ExcelSource",
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageReadSettings",
+                                    "recursive": true,
+                                    "enablePartitionDiscovery": false
+                                }
+                            },
+                            "sink": {
+                                "type": "DelimitedTextSink",
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageWriteSettings"
+                                },
+                                "formatSettings": {
+                                    "type": "DelimitedTextWriteSettings",
+                                    "quoteAllText": true,
+                                    "fileExtension": ".csv"
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Source ID",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Source ID",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Destination ID",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Destination ID",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Source_LAT",
+                                            "type": "Double",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Source_LAT",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Source_LONG",
+                                            "type": "Double",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Source_LONG",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Destination_LAT",
+                                            "type": "Double",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Destination_LAT",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Destination_LONG",
+                                            "type": "Double",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Destination_LONG",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Distance",
+                                            "type": "Double",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Distance",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        }
+                                    }
+                                ],
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "CustomerData",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "InputCSV",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "extractWarehouses",
+                        "type": "ExecuteDataFlow",
+                        "dependsOn": [
+                            {
+                                "activity": "ImportCustomerData",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataflow": {
+                                "referenceName": "extractWarehouses",
+                                "type": "DataFlowReference",
+                                "parameters": {},
+                                "datasetParameters": {
+                                    "ClientData": {},
+                                    "WarehouseCSV": {}
+                                }
+                            },
+                            "staging": {},
+                            "compute": {
+                                "coreCount": 8,
+                                "computeType": "General"
+                            },
+                            "traceLevel": "Fine"
+                        }
+                    },
+                    {
+                        "name": "extractRoutes",
+                        "type": "ExecuteDataFlow",
+                        "dependsOn": [
+                            {
+                                "activity": "ImportCustomerData",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataflow": {
+                                "referenceName": "extractRoutes",
+                                "type": "DataFlowReference",
+                                "parameters": {},
+                                "datasetParameters": {
+                                    "ReadInputData": {},
+                                    "RoutesCSV": {}
+                                }
+                            },
+                            "staging": {},
+                            "compute": {
+                                "coreCount": 8,
+                                "computeType": "General"
+                            },
+                            "traceLevel": "Fine"
+                        }
+                    },
+                    {
+                        "name": "LoadWarehouses",
+                        "type": "AzureFunctionActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "extractWarehouses",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "functionName": "insertcsv",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "filename": "warehouses.csv"
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureFunction1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "LoadRoutes",
+                        "type": "AzureFunctionActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "extractRoutes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "LoadWarehouses",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "functionName": "insertcsv",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "filename": "routes.csv"
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureFunction1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "DeleteTempDataset",
+                        "type": "Delete",
+                        "dependsOn": [
+                            {
+                                "activity": "LoadRoutes",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataset": {
+                                "referenceName": "InputCSV",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            },
+                            "logStorageSettings": {
+                                "linkedServiceName": {
+                                    "referenceName": "blobStorageService",
+                                    "type": "LinkedServiceReference"
+                                },
+                                "path": "logs"
+                            },
+                            "enableLogging": true,
+                            "storeSettings": {
+                                "type": "AzureBlobStorageReadSettings",
+                                "recursive": true,
+                                "enablePartitionDiscovery": false
+                            }
+                        }
+                    }
+                ],
+                "annotations": [],
+                "lastPublishTime": "2021-02-04T15:17:42Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/CustomerData')]",
+                "[concat(variables('factoryId'), '/datasets/InputCSV')]",
+                "[concat(variables('factoryId'), '/dataflows/extractWarehouses')]",
+                "[concat(variables('factoryId'), '/dataflows/extractRoutes')]",
+                "[concat(variables('factoryId'), '/linkedServices/AzureFunction1')]",
+                "[concat(variables('factoryId'), '/linkedServices/blobStorageService')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/blobStorageService')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobStorage",
+                "typeProperties": {
+                    "connectionString": "[parameters('blobStorageService_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+    ]

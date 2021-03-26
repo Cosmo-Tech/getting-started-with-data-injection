@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "location for resource created."
+            }
+        },
+        "factoryName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of an existing Digital Twins instances in the resource group."
+            }
+        },
+        "functionAppName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of an existing Function App in the resource group."
+            }
+        }
+    },
+    "variables": {},
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "name": "[concat(parameters('factoryName'),'/',parameters('functionAppName'))]",
+            "properties": {
+                "type": "AzureFunction",
+                "typeProperties": {
+                    "functionAppUrl": "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]",
+                    "functionKey": {
+                        "type": "SecureString",
+                        "value": "[listKeys(concat(resourceId('Microsoft.Web/sites/', parameters('functionAppName')), '/host/default'), '2020-12-01').functionKeys.default]"
+                    }
+                },
+                "dependsOn": []
+            }
+        }
+    ],
+    "outputs": {}
+}

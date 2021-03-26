@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "location for resource created."
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The name of the new storage account."
+            }
+        }
+    },
+    "variables": {
+        "storageName": "[parameters('storageAccountName')]"
+    },
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "resources": [
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2020-08-01-preview",
+                    "name": "default/input-csv",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+                    ],
+                    "properties": {
+                        "defaultEncryptionScope": "$account-encryption-key",
+                        "denyEncryptionScopeOverride": false,
+                        "publicAccess": "None"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2020-10-01",
+            "name": "injectInputData",
+            "location": "[resourceGroup().location]",
+            "kind": "AzureCLI",
+            "properties": {
+                "forceUpdateTag": "1",
+                "azCliVersion": "2.9.0",
+                "environmentVariables": [
+                    {
+                        "name": "INPUT_URI",
+                        "value": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/data/input.csv"
+                    },
+                    {
+                        "name": "CONTAINER_NAME",
+                        "value": "input-csv"
+                    },
+                    {
+                        "name": "BLOB_NAME",
+                        "value": "input.csv"
+                    },
+                    {
+                        "name": "STORAGE_ACCOUNT",
+                        "value": "[variables('storageName')]"
+                    },
+                    {
+                        "name": "STORAGE_KEY",
+                        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts',variables('storageName')) ,'2019-06-01').keys[0].value]"
+                    }
+                ],
+                "primaryScriptUri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/uploadInputCsv.sh",
+                "timeout": "PT1H",
+                "retentionInterval": "P1D",
+                "cleanupPreferences": "OnSuccess"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', variables('storageName'), 'default', 'input-csv')]"
+            ]
+        }
+    ],
+    "outputs": {}
+}
