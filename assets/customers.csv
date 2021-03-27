@@ -1,5 +1,5 @@
-Name,Satisfaction,SurroundingSatisfaction,Thirsty
-"Customer1",0,0,False
-"Customer2",0,0,False
-"Customer3",0,0,False
-"Customer4",0,0,False
+Bar,Name,Satisfaction,SurroundingSatisfaction,Thirsty
+"MyBar","Customer1",0,0,False
+"MyBar","Customer2",0,0,False
+"MyBar","Customer3",0,0,False
+"MyBar","Customer4",0,0,False
