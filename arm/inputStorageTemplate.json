@@ -45,6 +45,19 @@
                         "denyEncryptionScopeOverride": false,
                         "publicAccess": "None"
                     }
+                },
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2020-08-01-preview",
+                    "name": "default/temp-csv",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+                    ],
+                    "properties": {
+                        "defaultEncryptionScope": "$account-encryption-key",
+                        "denyEncryptionScopeOverride": false,
+                        "publicAccess": "None"
+                    }
                 }
             ]
         },
