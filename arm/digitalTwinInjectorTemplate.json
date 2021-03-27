@@ -43,7 +43,7 @@
                     "location": {
                         "value": "[parameters('location')]"
                     },
-                    "digitalTwinsInstancesName": {
+                    "digitalTwinsName": {
                         "value": "[variables('dtName')]"
                     },
                     "functionAppName": {
