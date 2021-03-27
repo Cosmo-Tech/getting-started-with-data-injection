@@ -59,16 +59,24 @@
                 "azCliVersion": "2.9.0",
                 "environmentVariables": [
                     {
-                        "name": "INPUT_URI",
-                        "value": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/data/input.csv"
+                        "name": "INPUT_URL",
+                        "value": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/assets"
                     },
                     {
                         "name": "CONTAINER_NAME",
                         "value": "input-csv"
                     },
                     {
-                        "name": "BLOB_NAME",
-                        "value": "input.csv"
+                        "name": "BARS_DATASET",
+                        "value": "bars.csv"
+                    },
+                    {
+                        "name": "CUSTOMERS_DATASET",
+                        "value": "customers.csv"
+                    },
+                    {
+                        "name": "CUSTOMER_RELATIONSHIPS_DATASET",
+                        "value": "customer_relationships.csv"
                     },
                     {
                         "name": "STORAGE_ACCOUNT",

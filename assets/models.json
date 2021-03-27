@@ -1,0 +1,62 @@
+[
+    {
+        "@context": [
+            "dtmi:dtdl:context;2"
+        ],
+        "@id": "dtmi:Bar;1",
+        "@type": "Interface",
+        "contents": [
+            {
+                "@type": "Property",
+                "name": "Stock",
+                "schema": "integer"
+            },
+            {
+                "@type": "Property",
+                "name": "RestockQty",
+                "schema": "integer"
+            },
+            {
+                "@type": "Property",
+                "name": "NbWaiters",
+                "schema": "integer"
+            },
+            {
+                "@type": "Relationship",
+                "name": "contains_Customer",
+                "target": "dtmi:Customer;1"
+            }
+        ],
+        "displayName": "Bar"
+    },
+    {
+        "@context": [
+            "dtmi:dtdl:context;2"
+        ],
+        "@id": "dtmi:Customer;1",
+        "@type": "Interface",
+        "contents": [
+            {
+                "@type": "Property",
+                "name": "Thirsty",
+                "schema": "boolean"
+            },
+            {
+                "@type": "Property",
+                "name": "Satisfaction",
+                "schema": "integer"
+            },
+            {
+                "@type": "Property",
+                "name": "SurroundingSatisfaction",
+                "schema": "integer"
+            },
+            {
+                "@type": "Relationship",
+                "name": "arc_to_Customer",
+                "target": "dtmi:Customer;1"
+            }
+        ],
+        "displayName": "Customer"
+    }
+]
