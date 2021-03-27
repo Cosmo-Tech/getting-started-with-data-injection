@@ -26,7 +26,7 @@
     },
     "variables": {
         "dtName": "[parameters('digitalTwinName')]",
-        "faName": "[if(empty(parameters('functionAppName')),concat('functionapp', take(uniqueString(resourceGroup().id),8)),parameters('functionAppName'))]"
+        "faName": "[if(empty(parameters('functionAppName')),concat('injector', take(uniqueString(resourceGroup().id),8)),parameters('functionAppName'))]"
     },
     "functions": [],
     "resources": [
@@ -37,7 +37,7 @@
             "properties": {
                 "mode": "incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/azure-digital-twin-injector/deploy/deploy/injector.json"
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/azure-digital-twin-injector/deploy/deploy/azuredeploy.json"
                 },
                 "parameters": {
                     "location": {
