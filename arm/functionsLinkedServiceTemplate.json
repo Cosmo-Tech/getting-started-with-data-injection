@@ -23,7 +23,7 @@
         }
     },
     "variables": {
-        "storageName": "['storage',parameters('functionAppName')]"
+        "storageName": "[concat('storage',parameters('functionAppName'))]"
     },
     "functions": [],
     "resources": [
