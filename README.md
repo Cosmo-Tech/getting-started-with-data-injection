@@ -10,6 +10,8 @@ Continuing on from our previous tutorials, our digital twin instances
 represent bars and their customers. Our model consists of a two twin
 model, a twin representing a bar and one representing a customer.
 
+to speedrun this tutorial: [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCosmo-Tech%2Fgetting-started-with-data-injection%2Fmain%2Farm%2Fazuredeploy.json)
+
 # Setting up the stage
 
 Make sure you are logged into [azure
