@@ -145,6 +145,6 @@ output dataset:
 ## Pipeline
 
 The pipeline enforces dependencies between various steps of the data injection process. For instance in our case bars and customer twins must exist before we can setup link between them.<br>
-![Customer dataflow](assets/factory_pipleline.png)
+![Customer dataflow](assets/factory_pipeline.png)
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCosmo-Tech%2Fgetting-started-with-data-injection%2Fmain%2Farm%2FpipelineTemplate.json)
