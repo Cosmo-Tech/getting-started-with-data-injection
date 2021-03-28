@@ -3,13 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {},
     "variables": {
-        "factoryName": "[csm.addSuffix('factory')]",
         "twinsName": "[csm.addSuffix('twins')]",
         "inputName": "[csm.addSuffix('storage')]",
         "factoryName": "[csm.addSuffix('factory')]",
         "functionName": "[csm.addSuffix('injector')]",
-        "inputServiceName": "[csm.addSuffix('inputService')]"
-        "outputServiceName": "[csm.addSuffix('outputService')]"
+        "inputServiceName": "[csm.addSuffix('inputService')]",
+        "outputServiceName": "[csm.addSuffix('outputService')]",
         "functionServiceName": "[csm.addSuffix('injector')]"
     },
     "functions": [
@@ -49,7 +48,7 @@
                         "value": "[variables('twinsName')]"
                     }
                 }
-            },
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -68,7 +67,7 @@
                         "value": "[variables('inputName')]"
                     }
                 }
-            },
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -87,7 +86,7 @@
                         "value": "[variables('factoryName')]"
                     }
                 }
-            },
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -205,7 +204,7 @@
                 "parameters": {
                     "factoryName": {
                         "value": "[variables('factoryName')]"
-                    },
+                    }
                 }
             },
             "dependsOn": [
