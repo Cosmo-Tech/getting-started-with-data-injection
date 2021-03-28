@@ -22,7 +22,9 @@
             }
         }
     },
-    "variables": {},
+    "variables": {
+        "storageName": "['storage',parameters('functionAppName')]"
+    },
     "functions": [],
     "resources": [
         {
@@ -39,6 +41,17 @@
                     }
                 },
                 "dependsOn": []
+            }
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/', concat('storage', parameters('linkedServiceName')))]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "type": "AzureBlobStorage",
+                "typeProperties": {
+                    "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                }
             }
         }
     ],
