@@ -1,0 +1,162 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name"
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/link_customers')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "customer_relationships",
+                                "type": "DatasetReference"
+                            },
+                            "name": "ReadInputData"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "customer_customer_twin_relationship",
+                                "type": "DatasetReference"
+                            },
+                            "name": "writeCustomerRelationships"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "SelectColumns"
+                        },
+                        {
+                            "name": "AddRelationshipName"
+                        }
+                    ],
+                    "script": "source(output(\n\t\tFrom as string,\n\t\tTo as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ReadInputData\nReadInputData select(mapColumn(\n\t\t{$id} = From,\n\t\t{$targetId} = To\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns derive({$relationshipName} = \"arc_to_Customer\",\n\t\t{$relationshipId} = concatWS('-', {$id}, 'arc_to_Customer', {$targetId})) ~> AddRelationshipName\nAddRelationshipName sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['customer_customer.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> writeCustomerRelationships"
+                }
+            }
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/add_customers_to_bars')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "customers",
+                                "type": "DatasetReference"
+                            },
+                            "name": "ReadInputData"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "bar_customer_twin_relationships",
+                                "type": "DatasetReference"
+                            },
+                            "name": "WriteBarCustomerRelationships"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "SelectColumns"
+                        },
+                        {
+                            "name": "AddRelationshipName"
+                        }
+                    ],
+                    "script": "source(output(\n\t\tBar as string,\n\t\tName as string,\n\t\tSatisfaction as string,\n\t\tSurroundingSatisfaction as string,\n\t\tThirsty as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ReadInputData\nReadInputData select(mapColumn(\n\t\t{$id} = Bar,\n\t\t{$targetId} = Name\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns derive({$relationshipName} = \"contains_Customer\",\n\t\t{$relationshipId} = concatWS('-', {$id}, 'contains_Customer', {$targetId})) ~> AddRelationshipName\nAddRelationshipName sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['customer_bars.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> WriteBarCustomerRelationships"
+                }
+            }
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/create_bar_twins')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "bars",
+                                "type": "DatasetReference"
+                            },
+                            "name": "ReadInputData"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "bar_twins",
+                                "type": "DatasetReference"
+                            },
+                            "name": "WriteBarTwins"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "SelectColumns"
+                        },
+                        {
+                            "name": "ModelColumn"
+                        }
+                    ],
+                    "script": "source(output(\n\t\tName as string,\n\t\tNbWaiters as string,\n\t\tStock as string,\n\t\tRestockQty as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ReadInputData\nReadInputData select(mapColumn(\n\t\t{$id} = Name,\n\t\tNbWaiters,\n\t\tStock,\n\t\tRestockQty\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns derive({$metadata.$model} = \"dtmi:Bar;1\") ~> ModelColumn\nModelColumn sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['bars.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> WriteBarTwins"
+                }
+            }
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/create_customer_twins')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "customers",
+                                "type": "DatasetReference"
+                            },
+                            "name": "ReadInputData"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "customer_twins",
+                                "type": "DatasetReference"
+                            },
+                            "name": "WriteCustomerTwins"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "SelectColumns"
+                        },
+                        {
+                            "name": "AddModel"
+                        }
+                    ],
+                    "script": "source(output(\n\t\tBar as string,\n\t\tName as string,\n\t\tSatisfaction as string,\n\t\tSurroundingSatisfaction as string,\n\t\tThirsty as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ReadInputData\nReadInputData select(mapColumn(\n\t\t{$id} = Name,\n\t\tSatisfaction,\n\t\tSurroundingSatisfaction,\n\t\tThirsty\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns derive({$metadata.$model} = \"dtmi:Customer;1\") ~> AddModel\nAddModel sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['customers.csv'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tsaveOrder: 1) ~> WriteCustomerTwins"
+                }
+            }
+        }
+    ]
+}

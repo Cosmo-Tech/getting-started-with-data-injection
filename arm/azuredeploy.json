@@ -1,0 +1,239 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {
+        "factoryName": "[csm.addSuffix('factory')]",
+        "twinsName": "[csm.addSuffix('twins')]",
+        "inputName": "[csm.addSuffix('storage')]",
+        "factoryName": "[csm.addSuffix('factory')]",
+        "functionName": "[csm.addSuffix('injector')]",
+        "inputServiceName": "[csm.addSuffix('inputService')]"
+        "outputServiceName": "[csm.addSuffix('outputService')]"
+        "functionServiceName": "[csm.addSuffix('injector')]"
+    },
+    "functions": [
+        {
+            "namespace": "csm",
+            "members": {
+                "addSuffix": {
+                    "parameters": [
+                        {
+                            "name": "prefix",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "type": "string",
+                        "value": "[concat(toLower(parameters('prefix')), uniqueString(resourceGroup().id))]"
+                    }
+                }
+            }
+        }
+    ],
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "twins-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/digitalTwinsInstancesTemplate.json"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "digitalTwinsName": {
+                        "value": "[variables('twinsName')]"
+                    }
+                }
+            },
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "input-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/inputStorageTemplate.json"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "storageAccountName": {
+                        "value": "[variables('inputName')]"
+                    }
+                }
+            },
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "factory-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/dataFactoryTemplate.json"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "dataFactoryName": {
+                        "value": "[variables('factoryName')]"
+                    }
+                }
+            },
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "input-linked-service-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/storageLinkedServiceTemplate.json"
+                },
+                "parameters": {
+                    "factoryName": {
+                        "value": "[variables('factoryName')]"
+                    },
+                    "storageName": {
+                        "value": "[variables('inputName')]"
+                    },
+                    "linkedServiceName": {
+                        "value": "[variables('inputServiceName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('factory-deployment')]",
+                "[resourceId('input-deployment')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "injector-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/digitalTwinInjectorTemplate.json"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "digitalTwinName": {
+                        "value": "[variables('twinsName')]"
+                    },
+                    "functionAppName": {
+                        "value": "[variables('functionName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('twins-deployment')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "output-linked-service-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/functionsLinkedServiceTemplate.json"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "factoryName": {
+                        "value": "[variables('factoryName')]"
+                    },
+                    "functionAppName": {
+                        "value": "[variables('functionName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('factory-deployment')]",
+                "[resourceId('injector-deployment')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "datasets-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/datasetsTemplate.json"
+                },
+                "parameters": {
+                    "factoryName": {
+                        "value": "[variables('factoryName')]"
+                    },
+                    "inputLinkedServiceName": {
+                        "value": "[variables('inputServiceName')]"
+                    },
+                    "outputLinkedServiceName": {
+                        "value": "[variables('outputServiceName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('factory-deployment')]",
+                "[resourceId('input-linked-service-deployment')]",
+                "[resourceId('output-linked-service-deployment')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "dataflows-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/dataflowsTemplate.json"
+                },
+                "parameters": {
+                    "factoryName": {
+                        "value": "[variables('factoryName')]"
+                    },
+                }
+            },
+            "dependsOn": [
+                "[resourceId('factory-deployment')]",
+                "[resourceId('datasets-deployment')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "pipeline-deployment",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/pipelineTemplate.json"
+                },
+                "parameters": {
+                    "factoryName": {
+                        "value": "[variables('factoryName')]"
+                    },
+                    "injectorServiceName": {
+                        "value": "[variables('functionServiceName')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        }
+    ],
+    "outputs": {}
+}
+
