@@ -44,7 +44,7 @@
             }
         },
         {
-            "name": "[concat(parameters('factoryName'), '/', concat('storage', parameters('linkedServiceName')))]",
+            "name": "[concat(parameters('factoryName'), '/', 'storage', parameters('functionAppName'))]",
             "type": "Microsoft.DataFactory/factories/linkedServices",
             "apiVersion": "2018-06-01",
             "properties": {
