@@ -102,7 +102,7 @@
                 ],
                 "primaryScriptUri": "https://raw.githubusercontent.com/Cosmo-Tech/getting-started-with-data-injection/main/arm/uploadInputCsv.sh",
                 "timeout": "PT1H",
-                "retentionInterval": "P1D",
+                "retentionInterval": "PT1H",
                 "cleanupPreferences": "OnSuccess"
             },
             "dependsOn": [

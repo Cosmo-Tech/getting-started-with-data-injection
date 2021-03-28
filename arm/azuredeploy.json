@@ -24,7 +24,7 @@
                     ],
                     "output": {
                         "type": "string",
-                        "value": "[concat(toLower(parameters('prefix')), uniqueString(resourceGroup().id))]"
+                        "value": "[concat(toLower(parameters('prefix')), take(uniqueString(resourceGroup().id), 8))]"
                     }
                 }
             }
@@ -44,7 +44,7 @@
                     "location": {
                         "value": "[resourceGroup().location]"
                     },
-                    "digitalTwinsName": {
+                    "digitalTwinName": {
                         "value": "[variables('twinsName')]"
                     }
                 }
@@ -110,8 +110,8 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('factory-deployment')]",
-                "[resourceId('input-deployment')]"
+                "[resourceId('Microsoft.Resources/deployments', 'factory-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'input-deployment')]"
             ]
         },
         {
@@ -136,7 +136,7 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('twins-deployment')]"
+                "[resourceId('Microsoft.Resources/deployments', 'twins-deployment')]"
             ]
         },
         {
@@ -161,8 +161,8 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('factory-deployment')]",
-                "[resourceId('injector-deployment')]"
+                "[resourceId('Microsoft.Resources/deployments', 'factory-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'injector-deployment')]"
             ]
         },
         {
@@ -187,9 +187,9 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('factory-deployment')]",
-                "[resourceId('input-linked-service-deployment')]",
-                "[resourceId('output-linked-service-deployment')]"
+                "[resourceId('Microsoft.Resources/deployments', 'factory-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'input-linked-service-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'output-linked-service-deployment')]"
             ]
         },
         {
@@ -208,8 +208,8 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('factory-deployment')]",
-                "[resourceId('datasets-deployment')]"
+                "[resourceId('Microsoft.Resources/deployments', 'factory-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'datasets-deployment')]"
             ]
         },
         {
@@ -230,7 +230,11 @@
                     }
                 }
             },
-            "dependsOn": []
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'factory-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'datasets-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'dataflows-deployment')]"
+            ]
         }
     ],
     "outputs": {}
