@@ -78,7 +78,7 @@
                             }
                         },
                         "linkedServiceName": {
-                            "referenceName": "parameters('injectorServiceName')",
+                            "referenceName": "[parameters('injectorServiceName')]",
                             "type": "LinkedServiceReference"
                         }
                     },

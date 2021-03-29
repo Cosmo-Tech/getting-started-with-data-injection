@@ -182,7 +182,7 @@
                         "value": "[variables('inputServiceName')]"
                     },
                     "outputLinkedServiceName": {
-                        "value": "[variables('outputServiceName')]"
+                        "value": "[concat('storage', variables('functionName'))]"
                     }
                 }
             },
