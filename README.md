@@ -19,7 +19,7 @@ portal](https://portal.azure.com) before you start. If you followed
 the tutorials on model creation you already have an Azure Digital
 Twins Instances populated with your models and you can skip the first
 step and go directly to [Uploading the input file to azure
-storage](#markdown-header-input-storage). Just make sure to create all
+storage](#input-storage). Just make sure to create all
 the azure resources in the same resource group as your existing Azure
 Digital Twin Instances.
 
