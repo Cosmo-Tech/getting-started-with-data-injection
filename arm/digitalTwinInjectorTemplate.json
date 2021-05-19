@@ -37,7 +37,7 @@
             "properties": {
                 "mode": "incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/azure-digital-twin-injector/deploy/deploy/azuredeploy.json"
+                    "uri": "https://raw.githubusercontent.com/Cosmo-Tech/azure-digital-twin-injector/main/deploy/azuredeploy.json"
                 },
                 "parameters": {
                     "location": {
