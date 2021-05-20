@@ -16,6 +16,13 @@
                 "description": "Name of an existing Digital Twins Instances in the resource group."
             }
         },
+        "digitalTwinUrl": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "URL to an existing Digital Twins Instances in the resource group."
+            }
+        },
         "functionAppName": {
             "type": "string",
             "defaultValue": "",
@@ -26,6 +33,7 @@
     },
     "variables": {
         "dtName": "[parameters('digitalTwinName')]",
+        "dtUrl": "[parameters('digitalTwinUrl')]",
         "faName": "[if(empty(parameters('functionAppName')),concat('injector', take(uniqueString(resourceGroup().id),8)),parameters('functionAppName'))]"
     },
     "functions": [],
@@ -45,6 +53,9 @@
                     },
                     "digitalTwinsName": {
                         "value": "[variables('dtName')]"
+                    },
+                    "digitalTwinsUrl": {
+                        "value": "[variables('dtUrl')]"
                     },
                     "functionAppName": {
                         "value": "[variables('faName')]"
