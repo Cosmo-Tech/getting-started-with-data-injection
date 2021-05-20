@@ -9,7 +9,7 @@
         "injectorServiceName": {
             "type": "string",
             "metadata": "Injector Linked Service Name"
-        },
+        }
     },
     "functions": [],
     "variables": {},
