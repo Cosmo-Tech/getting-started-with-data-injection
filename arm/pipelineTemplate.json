@@ -244,7 +244,7 @@
                         "userProperties": [],
                         "typeProperties": {
                             "dataflow": {
-                                "referenceName": "create_customer_twins",
+                                "referenceName": "add_customers_to_bars",
                                 "type": "DataFlowReference",
                                 "parameters": {},
                                 "datasetParameters": {
