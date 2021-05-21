@@ -183,6 +183,10 @@
                             "body": {
                                 "filename": "customers.csv"
                             }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "[parameters('injectorServiceName')]",
+                            "type": "LinkedServiceReference"
                         }
                     },
                     {
@@ -239,6 +243,15 @@
                         },
                         "userProperties": [],
                         "typeProperties": {
+                            "dataflow": {
+                                "referenceName": "create_customer_twins",
+                                "type": "DataFlowReference",
+                                "parameters": {},
+                                "datasetParameters": {
+                                    "ReadInputData": {},
+                                    "WriteCustomerTwins": {}
+                                }
+                            },
                             "staging": {},
                             "compute": {
                                 "coreCount": 8,
@@ -285,6 +298,10 @@
                             "body": {
                                 "filename": "customer_bars.csv"
                             }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "[parameters('injectorServiceName')]",
+                            "type": "LinkedServiceReference"
                         }
                     },
                     {
@@ -390,6 +407,10 @@
                             "body": {
                                 "filename": "customer_customer.csv"
                             }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "[parameters('injectorServiceName')]",
+                            "type": "LinkedServiceReference"
                         }
                     },
                     {
