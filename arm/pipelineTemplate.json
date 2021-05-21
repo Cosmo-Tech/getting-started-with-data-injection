@@ -9,6 +9,10 @@
         "injectorServiceName": {
             "type": "string",
             "metadata": "Injector Linked Service Name"
+        },
+        "inputServiceName": {
+            "type": "string",
+            "metadata": "Input storage linked service name (for logging purposes)"
         }
     },
     "functions": [],
@@ -107,6 +111,13 @@
                                 "type": "DatasetReference",
                                 "parameters": {}
                             },
+                            "logStorageSettings": {
+                                "linkedServiceName": {
+                                    "referenceName": "[parameters('inputServiceName')]",
+                                    "type": "LinkedServiceReference"
+                                },
+                                "path": "logs"
+                            },
                             "enableLogging": true,
                             "storeSettings": {
                                 "type": "AzureBlobStorageReadSettings",
@@ -166,7 +177,12 @@
                         },
                         "userProperties": [],
                         "typeProperties": {
-                            "headers": {}
+                            "functionName": "insertcsv",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "filename": "customers.csv"
+                            }
                         }
                     },
                     {
@@ -193,6 +209,13 @@
                                 "referenceName": "customer_twins",
                                 "type": "DatasetReference",
                                 "parameters": {}
+                            },
+                            "logStorageSettings": {
+                                "linkedServiceName": {
+                                    "referenceName": "[parameters('inputServiceName')]",
+                                    "type": "LinkedServiceReference"
+                                },
+                                "path": "logs"
                             },
                             "enableLogging": true,
                             "storeSettings": {
@@ -256,7 +279,12 @@
                         },
                         "userProperties": [],
                         "typeProperties": {
-                            "headers": {}
+                            "functionName": "insertcsv",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "filename": "customer_bars.csv"
+                            }
                         }
                     },
                     {
@@ -283,6 +311,13 @@
                                 "referenceName": "bar_customer_twin_relationships",
                                 "type": "DatasetReference",
                                 "parameters": {}
+                            },
+                            "logStorageSettings": {
+                                "linkedServiceName": {
+                                    "referenceName": "[parameters('inputServiceName')]",
+                                    "type": "LinkedServiceReference"
+                                },
+                                "path": "logs"
                             },
                             "enableLogging": true,
                             "storeSettings": {
@@ -349,7 +384,12 @@
                         },
                         "userProperties": [],
                         "typeProperties": {
-                            "headers": {}
+                            "functionName": "insertcsv",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "filename": "customer_customer.csv"
+                            }
                         }
                     },
                     {
@@ -376,6 +416,13 @@
                                 "referenceName": "customer_customer_twin_relationship",
                                 "type": "DatasetReference",
                                 "parameters": {}
+                            },
+                            "logStorageSettings": {
+                                "linkedServiceName": {
+                                    "referenceName": "[parameters('inputServiceName')]",
+                                    "type": "LinkedServiceReference"
+                                },
+                                "path": "logs"
                             },
                             "enableLogging": true,
                             "storeSettings": {
