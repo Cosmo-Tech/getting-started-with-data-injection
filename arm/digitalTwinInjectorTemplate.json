@@ -16,13 +16,6 @@
                 "description": "Name of an existing Digital Twins Instances in the resource group."
             }
         },
-        "digitalTwinUrl": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "URL to an existing Digital Twins Instances in the resource group."
-            }
-        },
         "functionAppName": {
             "type": "string",
             "defaultValue": "",
@@ -33,7 +26,7 @@
     },
     "variables": {
         "dtName": "[parameters('digitalTwinName')]",
-        "dtUrl": "[parameters('digitalTwinUrl')]",
+        "dtUrl": "[concat('https://',reference(resourceId('Microsoft.DigitalTwins/digitalTwinsInstances',variables('twinsName')),'2020-12-01','Full').properties.hostName)]",
         "faName": "[if(empty(parameters('functionAppName')),concat('injector', take(uniqueString(resourceGroup().id),8)),parameters('functionAppName'))]"
     },
     "functions": [],
