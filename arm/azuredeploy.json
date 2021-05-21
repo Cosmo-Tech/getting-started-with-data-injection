@@ -130,6 +130,9 @@
                     "digitalTwinName": {
                         "value": "[variables('twinsName')]"
                     },
+                    "digitalTwinUrl": {
+                        "value": "[concat('https://',reference(resourceId('Microsoft.DigitalTwins/digitalTwinsInstances',variables('twinsName')),'2020-12-01','Full').properties.hostName)]"
+                    },
                     "functionAppName": {
                         "value": "[variables('functionName')]"
                     }
