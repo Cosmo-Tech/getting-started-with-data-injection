@@ -26,7 +26,6 @@
     },
     "variables": {
         "dtName": "[parameters('digitalTwinName')]",
-        "dtUrl": "[concat('https://',reference(resourceId('Microsoft.DigitalTwins/digitalTwinsInstances',parameters('digitalTwinName')),'2020-12-01','Full').properties.hostName)]",
         "faName": "[if(empty(parameters('functionAppName')),concat('injector', take(uniqueString(resourceGroup().id),8)),parameters('functionAppName'))]"
     },
     "functions": [],
@@ -48,7 +47,7 @@
                         "value": "[variables('dtName')]"
                     },
                     "digitalTwinsUrl": {
-                        "value": "[variables('dtUrl')]"
+                        "value": "[concat('https://',reference(resourceId('Microsoft.DigitalTwins/digitalTwinsInstances',parameters('digitalTwinName')),'2020-12-01','Full').properties.hostName)]"
                     },
                     "functionAppName": {
                         "value": "[variables('faName')]"
