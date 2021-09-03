@@ -88,10 +88,10 @@ process. First We need to install
 [azure-digital-twin-injector](https://github.com/Cosmo-Tech/azure-digital-twin-injector),
 a set of Azure Functions that wraps Azure Digital Twins REST API to
 ease its connection into Data Factory. The following template deploys
-the injector and gives the Function App the role of Azure Digital Twin
-Data Owner in this resource group. As for the previous steps, select
-your resource group, enter the name of your Digital Twins, and a new
-name for the injector Function App.
+the injector Azure function. WARNING: After deploying you must set the azure
+function as 'Azure Digital Twins Data Owner' of the ADT you want to handle.
+As for the previous steps, select your resource group, enter the name of
+your Digital Twins, and a new name for the injector Function App.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCosmo-Tech%2Fgetting-started-with-data-injection%2Fmain%2Farm%2FdigitalTwinInjectorTemplate.json)
 
